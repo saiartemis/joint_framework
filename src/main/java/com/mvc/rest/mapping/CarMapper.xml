@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mvc.rest.dao.CarDao">
+	<resultMap id="BaseResultMap" type="com.mvc.rest.entity.Car">
+		<id column="CAR_ID" jdbcType="VARCHAR" property="carId" />
+		<result column="CAR_NO" jdbcType="VARCHAR" property="carNo" />
+		<result column="DRIVER" jdbcType="VARCHAR" property="driver" />
+		<result column="BAK" jdbcType="VARCHAR" property="bak" />
+		<result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+		<result column="CAR_STATUS_ID" jdbcType="VARCHAR" property="carStatusId" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		CAR_ID, CAR_NO, DRIVER, BAK, USER_ID, CAR_STATUS_ID
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bm_car
+		where CAR_ID = #{carId,jdbcType=VARCHAR}
+	</select>
+	<select id="getCarList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bm_car
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from bm_car
+		where CAR_ID = #{carId,jdbcType=VARCHAR}
+	</delete>
+	<insert id="insert" parameterType="com.mvc.rest.entity.Car">
+		insert into bm_car (CAR_ID,
+		CAR_NO, DRIVER,
+		BAK, USER_ID, CAR_STATUS_ID
+		)
+		values
+		(#{carId,jdbcType=VARCHAR}, #{carNo,jdbcType=VARCHAR},
+		#{driver,jdbcType=VARCHAR},
+		#{bak,jdbcType=VARCHAR},
+		#{userId,jdbcType=VARCHAR}, #{carStatusId,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.mvc.rest.entity.Car">
+		insert into bm_car
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="carId != null">
+				CAR_ID,
+			</if>
+			<if test="carNo != null">
+				CAR_NO,
+			</if>
+			<if test="driver != null">
+				DRIVER,
+			</if>
+			<if test="bak != null">
+				BAK,
+			</if>
+			<if test="userId != null">
+				USER_ID,
+			</if>
+			<if test="carStatusId != null">
+				CAR_STATUS_ID,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="carId != null">
+				#{carId,jdbcType=VARCHAR},
+			</if>
+			<if test="carNo != null">
+				#{carNo,jdbcType=VARCHAR},
+			</if>
+			<if test="driver != null">
+				#{driver,jdbcType=VARCHAR},
+			</if>
+			<if test="bak != null">
+				#{bak,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=VARCHAR},
+			</if>
+			<if test="carStatusId != null">
+				#{carStatusId,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.mvc.rest.entity.Car">
+		update bm_car
+		<set>
+			<if test="carNo != null">
+				CAR_NO = #{carNo,jdbcType=VARCHAR},
+			</if>
+			<if test="driver != null">
+				DRIVER = #{driver,jdbcType=VARCHAR},
+			</if>
+			<if test="bak != null">
+				BAK = #{bak,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				USER_ID = #{userId,jdbcType=VARCHAR},
+			</if>
+			<if test="carStatusId != null">
+				CAR_STATUS_ID = #{carStatusId,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where CAR_ID = #{carId,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.mvc.rest.entity.Car">
+		update bm_car
+		set
+		CAR_NO = #{carNo,jdbcType=VARCHAR},
+		DRIVER =
+		#{driver,jdbcType=VARCHAR},
+		BAK = #{bak,jdbcType=VARCHAR},
+		USER_ID =
+		#{userId,jdbcType=VARCHAR},
+		CAR_STATUS_ID =
+		#{carStatusId,jdbcType=VARCHAR}
+		where CAR_ID =
+		#{carId,jdbcType=VARCHAR}
+	</update>
+
+</mapper>

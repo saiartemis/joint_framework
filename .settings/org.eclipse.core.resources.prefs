@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/java/com/mvc/rest/controller/LoginController.java=UTF-8
+encoding//src/main/java/com/mvc/rest/controller/UserController.java=UTF-8
+encoding//src/main/java/com/mvc/rest/service/MonitorRealm.java=UTF-8
+encoding//src/main/resources/log4j.properties=gbk

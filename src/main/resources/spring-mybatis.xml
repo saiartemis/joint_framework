@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+">
+	<!-- 配置连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		destroy-method="close">
+		<!--驱动名称 -->
+		<property name="driverClassName" value="${driverClassName}" />
+		<!--访问地址 -->
+		<property name="url" value="${jdbc_url}" />
+		<!--用户名 -->
+		<property name="username" value="${jdbc_username}" />
+		<!--密码 -->
+		<property name="password" value="${jdbc_password}" />
+		<!--初始大小 -->
+		<property name="initialSize" value="2" />
+		<!--最大连接池数量 -->
+		<property name="maxActive" value="40" />
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="2" />
+		<!--获取连接时最大等待时间，单位毫秒。 -->
+		<property name="maxWait" value="15000" />
+		<!--用来检测连接是否有效的sql，要求是一个查询语句。 -->
+		<property name="validationQuery" value="select 1" />
+		<!--申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。 -->
+		<property name="testOnBorrow" value="false" />
+		<!--建议配置为true，不影响性能，并且保证安全性。 -->
+		<property name="testWhileIdle" value="true" />
+		<!--配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="120000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<!--对于长时间不使用的连接强制关闭 -->
+		<property name="removeAbandoned" value="true" />
+		<!--超过30分钟开始关闭空闲连接(秒为单位) -->
+		<property name="removeAbandonedTimeout" value="1800" />
+		<!--将当前关闭动作记录到日志 -->
+		<property name="logAbandoned" value="true" />
+		<!--自动提交,如果不启用事物可设置为true -->
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+
+	<!-- myBatis文件 -->
+	<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:com/mvc/rest/mapping/*.xml" />
+	</bean>
+
+
+	<!-- 自动扫描mapper目录 -->
+
+	<bean name="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.mvc.rest.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+	<!-- 注解方式配置事物 -->
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
+
+	<!-- 拦截器方式配置事物 -->
+	<!--定义事物拦截的处理逻辑 1. REQUIRED: 如果存在一个事务，则支持当前事务。如果没有事务则开启新的事物。 2. SUPPORTS: 
+		如果存在一个事务，支持当前事务。如果没有事务，则非事务的执行。 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+
+		<tx:attributes>
+			<!--对于写操作,配置REQUIRED -->
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="append*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="edit*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="repair" propagation="REQUIRED" />
+			<tx:method name="delAndRepair" propagation="REQUIRED" />
+			<!--对于读操作,配置SUPPORTS -->
+			<tx:method name="get*" propagation="SUPPORTS" />
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="load*" propagation="SUPPORTS" />
+			<tx:method name="search*" propagation="SUPPORTS" />
+			<tx:method name="query*" propagation="SUPPORTS" />
+			<tx:method name="*" propagation="SUPPORTS" />
+
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!--配置切点（需要拦截的位置） --><!-- com.ibeifeng.service..表示 service目录下（包含子包） (..)表示不管几个参数 -->
+		<aop:pointcut id="transactionPointcut"
+			expression="execution(* com.mvc.rest.service..*Service.*(..))" />
+		<!--把切点和处理逻辑相关联 -->
+		<aop:advisor pointcut-ref="transactionPointcut"
+			advice-ref="transactionAdvice" />
+	</aop:config>
+
+</beans>
